@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LabSupply ระบบบริหารวัสดุคงคลัง</title>
+<meta name="description" content="ระบบบริหารวัสดุคงคลัง งานบริการผู้ป่วยนอก กลุ่มงานเทคนิคการแพทย์และพยาธิวิทยาคลินิก โรงพยาบาลสมเด็จพระพุทธเลิศหล้า">
+<meta name="theme-color" content="#0D9488">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="LabSupply">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link href="assets/app.css?v=1.0.0" rel="stylesheet">
+<style id="theme-vars"></style>
+</head>
+<body>
+
+<div id="spBoot" class="sp-boot"><div class="text-center"><div class="sp-spin"></div><div class="small text-muted mt-3">กำลังเปิดระบบ...</div></div></div>
+
+<!-- ============ หน้าเข้าสู่ระบบ ============ -->
+<div id="spLogin" class="login-wrap d-none">
+  <div class="login-art">
+    <div class="d-flex align-items-center gap-2">
+      <div class="sb-logo m-0" id="lgLogo"><i class="bi bi-box-seam"></i></div>
+      <div><div class="fw-bold" id="lgShort">LabSupply</div><div class="small opacity-75" id="lgSys">ระบบบริหารวัสดุคงคลัง</div></div>
+    </div>
+    <img class="hero d-none d-lg-block" id="lgArt" alt="" src="img/labsupply-hero.png" onerror="this.style.display='none'">
+    <div>
+      <div class="lg-h" id="lgTitle">ระบบบริหารวัสดุคงคลัง</div>
+      <div class="lg-dept" id="lgDept">งานบริการผู้ป่วยนอก</div>
+      <div class="opacity-75" id="lgGroup">กลุ่มงานเทคนิคการแพทย์และพยาธิวิทยาคลินิก</div>
+      <div class="opacity-75" id="lgHosp">โรงพยาบาลสมเด็จพระพุทธเลิศหล้า</div>
+      <div class="lg-feats"><span><i class="bi bi-upc-scan"></i> สแกนบาร์โค้ดรับเข้า-จ่ายออก</span><span><i class="bi bi-hourglass-split"></i> เตือนใกล้หมดอายุ 30/60/120 วัน</span><span><i class="bi bi-cash-stack"></i> คงเหลือและมูลค่ารวม</span></div>
+    </div>
+  </div>
+  <div class="login-form">
+    <div class="login-card">
+      <div id="lgMain">
+        <h1 class="h4 fw-bold mb-1">เข้าสู่ระบบ</h1>
+        <div class="text-muted small mb-4">ใช้ชื่อผู้ใช้และรหัสผ่านที่ผู้ดูแลระบบกำหนดให้</div>
+        <form id="lgForm" autocomplete="on">
+          <div class="mb-3">
+            <label class="form-label" for="lgUser">ชื่อผู้ใช้</label>
+            <div class="input-ico"><i class="bi bi-person"></i><input class="form-control" id="lgUser" name="username" autocomplete="username" autocapitalize="none" required></div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="lgPass">รหัสผ่าน</label>
+            <div class="input-group">
+              <span class="input-group-text bg-white"><i class="bi bi-lock"></i></span>
+              <input class="form-control" type="password" id="lgPass" name="password" autocomplete="current-password" required>
+              <button class="btn btn-light border" type="button" id="lgEye" aria-label="แสดงรหัสผ่าน"><i class="bi bi-eye"></i></button>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-lg w-100" id="lgBtn" type="submit"><i class="bi bi-box-arrow-in-right"></i> เข้าสู่ระบบ</button>
+        </form>
+      </div>
+      <div id="lgSetup" class="d-none">
+        <h1 class="h5 fw-bold mb-1">ตั้งค่าการเชื่อมต่อ</h1>
+        <div class="text-muted small mb-3">วาง URL ของ Google Apps Script Web App (ลงท้ายด้วย /exec) ค่านี้เก็บไว้ในเครื่องนี้เท่านั้น แนะนำให้แก้ที่ไฟล์ js/config.js เพื่อให้ทุกเครื่องใช้ได้ทันที</div>
+        <input class="form-control mb-2" id="lgApi" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off">
+        <div class="d-flex gap-2">
+          <button class="btn btn-light flex-fill" type="button" id="lgApiTest"><i class="bi bi-activity"></i> ทดสอบ</button>
+          <button class="btn btn-primary flex-fill" type="button" id="lgApiSave"><i class="bi bi-check2"></i> บันทึก</button>
+        </div>
+        <div class="small mt-2" id="lgApiMsg"></div>
+        <button class="btn btn-link btn-sm px-0 mt-2" type="button" id="lgBack"><i class="bi bi-arrow-left"></i> กลับไปหน้าเข้าสู่ระบบ</button>
+      </div>
+      <div class="d-flex justify-content-between align-items-center mt-4 small text-muted gap-2">
+        <span></span>
+        <button class="btn btn-link btn-sm p-0 text-muted" type="button" id="lgConn"><i class="bi bi-plug"></i> การเชื่อมต่อ</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ แอปหลัก ============ -->
+<div id="spApp" class="d-none">
+  <nav class="sb-rail" id="spRail" aria-label="เมนูหลัก"></nav>
+  <div class="sb-main">
+    <header class="sb-topbar">
+      <div class="sb-org">
+        <div class="t" id="spOrgT">งานบริการผู้ป่วยนอก</div>
+        <div class="s" id="spOrgS">กลุ่มงานเทคนิคการแพทย์และพยาธิวิทยาคลินิก · โรงพยาบาลสมเด็จพระพุทธเลิศหล้า</div>
+      </div>
+      <button class="sb-search" id="spSearchBtn" type="button" aria-label="ค้นหา"><i class="bi bi-search"></i><span>ค้นหาวัสดุ เมนู คู่มือ</span><kbd>Ctrl K</kbd></button>
+      <button class="sb-icon-btn" id="spHelpBtn" type="button" title="คู่มือของหน้านี้" aria-label="คู่มือของหน้านี้"><i class="bi bi-question-circle"></i></button>
+      <a class="sb-icon-btn" href="#/alerts" id="spBellBtn" title="แจ้งเตือน" aria-label="แจ้งเตือน"><i class="bi bi-bell"></i><span class="dot d-none"></span></a>
+      <div class="dropdown">
+        <button class="sb-profile" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <span class="avatar sm" id="spAvatar">A</span>
+          <span class="who text-start d-none d-md-block"><b id="spUserName" class="small">ผู้ใช้</b><small id="spUserRole">บทบาท</small></span>
+          <i class="bi bi-chevron-down small text-muted"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" id="spProfileMenu"></ul>
+      </div>
+    </header>
+    <main class="sb-content" id="spPage"></main>
+    <footer class="sb-footer"><span id="spFootOrg">LabSupply</span></footer>
+  </div>
+  <nav class="sb-bottom" id="spBottom" aria-label="เมนูมือถือ"></nav>
+</div>
+
+<!-- popup กลางตัวเดียวของทั้งระบบ (SP.ui.modal) -->
+<div class="modal fade" id="spModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title" id="spModalTitle"></h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="ปิด"></button></div>
+      <div class="modal-body" id="spModalBody"></div>
+      <div class="modal-footer" id="spModalFoot"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ค้นหา Ctrl K -->
+<div class="modal fade" id="spSearch" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-1">
+        <div class="sp-search-box"><i class="bi bi-search"></i><input class="form-control" id="spSearchInput" placeholder="พิมพ์ชื่อวัสดุ รหัส บาร์โค้ด เมนู หรือหัวข้อคู่มือ" autocomplete="off"></div>
+      </div>
+      <div class="modal-body pt-1" id="spSearchBody"></div>
+    </div>
+  </div>
+</div>
+
+<!-- เมนูทั้งหมด (ปุ่มกลางมือถือ) -->
+<div class="offcanvas offcanvas-bottom menu-sheet" tabindex="-1" id="spMenuSheet" aria-label="เมนูทั้งหมด">
+  <div class="grab"></div>
+  <div class="offcanvas-header pb-1"><h5 class="offcanvas-title fw-bold">เมนูทั้งหมด</h5><button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="ปิด"></button></div>
+  <div class="offcanvas-body pt-2" id="spMenuSheetBody"></div>
+</div>
+
+<!-- กล้องสแกน: overlay เต็มจอ แยกจาก popup -->
+<div id="spCam" class="sp-cam d-none" aria-hidden="true">
+  <div class="sp-cam-top">
+    <button class="sp-cam-btn" type="button" data-cam="close" aria-label="ปิดกล้อง"><i class="bi bi-x-lg"></i></button>
+    <div class="sp-cam-title" id="spCamTitle">สแกนบาร์โค้ด</div>
+    <button class="sp-cam-btn d-none" type="button" data-cam="torch" id="spCamTorch" aria-label="ไฟฉาย"><i class="bi bi-lightning-charge"></i></button>
+    <button class="sp-cam-btn" type="button" data-cam="switch" id="spCamSwitch" aria-label="สลับกล้อง"><i class="bi bi-arrow-repeat"></i></button>
+  </div>
+  <div class="sp-cam-view" id="spCamView"><div id="spCamReader"></div><div class="sp-cam-msg" id="spCamMsg"></div></div>
+  <div class="sp-cam-panel">
+    <div class="sp-cam-last" id="spCamLast"><i class="bi bi-upc-scan"></i> เล็งบาร์โค้ดให้อยู่ในกรอบ</div>
+    <div class="input-group mb-2">
+      <input class="form-control" id="spCamManual" placeholder="หรือพิมพ์รหัส/บาร์โค้ดแล้วกด Enter" autocomplete="off" inputmode="text">
+      <button class="btn btn-light border" type="button" data-cam="manual">ตกลง</button>
+    </div>
+    <div class="d-flex align-items-center justify-content-between gap-2">
+      <div class="form-check form-switch m-0"><input class="form-check-input" type="checkbox" id="spCamCont" checked><label class="form-check-label small" for="spCamCont">สแกนต่อเนื่อง</label></div>
+      <button class="btn btn-primary px-4" type="button" data-cam="close"><i class="bi bi-check2"></i> เสร็จสิ้น</button>
+    </div>
+  </div>
+</div>
+
+<div id="printArea"></div>
+<div id="spToasts" class="sp-toasts" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/config.js?v=1.0.0"></script>
+<script src="js/core.js?v=1.0.0"></script>
+<script src="js/scan.js?v=1.0.0"></script>
+<script src="js/print.js?v=1.0.0"></script>
+<script src="js/docs.js?v=1.0.0"></script>
+<script src="js/pages/dashboard.js?v=1.0.0"></script>
+<script src="js/pages/items.js?v=1.0.0"></script>
+<script src="js/pages/receive.js?v=1.0.0"></script>
+<script src="js/pages/issue.js?v=1.0.0"></script>
+<script src="js/pages/stock.js?v=1.0.0"></script>
+<script src="js/pages/alerts.js?v=1.0.0"></script>
+<script src="js/pages/reports.js?v=1.0.0"></script>
+<script src="js/pages/settings.js?v=1.0.0"></script>
+<script src="js/guide-content.js?v=1.0.0"></script>
+<script src="js/pages/guide.js?v=1.0.0"></script>
+<script src="js/app.js?v=1.0.0"></script>
+</body>
+</html>
