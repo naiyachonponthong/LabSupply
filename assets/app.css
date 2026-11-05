@@ -527,3 +527,16 @@ ol.guide-steps > li::before { content: counter(st); position: absolute; left: 0;
 .lg-feats { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.1rem; }
 .lg-feats span { background: rgba(255, 255, 255, .16); border-radius: 999px; padding: .35rem .85rem; font-size: .85rem; display: inline-flex; gap: .4rem; align-items: center; }
 @media (max-width: 991.98px) { .lg-feats { display: none; } }
+
+/* ---------- รูปวัสดุ ---------- */
+.thumb { width: 40px; height: 40px; border-radius: 11px; overflow: hidden; flex: none; display: inline-grid; place-items: center; background: #f1f5f9; color: var(--c, #94a3b8); font-size: 1.05rem; vertical-align: middle; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; }
+.thumb.noimg { background: color-mix(in srgb, var(--c, #94a3b8) 12%, #fff); }
+.thumb.sm { width: 32px; height: 32px; border-radius: 9px; font-size: .9rem; }
+.thumb.lg { width: 72px; height: 72px; border-radius: 14px; font-size: 1.6rem; }
+.thumb.xl { width: 180px; height: 180px; border-radius: 18px; font-size: 2.6rem; box-shadow: var(--sb-shadow); }
+.thumb.xl img { object-fit: contain; background: #fff; }
+.cl-head .thumb { margin-top: 1px; }
+.photo-box { width: 120px; height: 120px; border-radius: 16px; background: #edf0f5; display: grid; place-items: center; overflow: hidden; color: var(--sb-muted); font-size: 2rem; flex: none; }
+.photo-box img { width: 100%; height: 100%; object-fit: cover; }
+@media (max-width: 991.98px) { .thumb.xl { width: 140px; height: 140px; } }

@@ -12,8 +12,8 @@
       items: [['org', 'ข้อมูลหน่วยงาน', 'bi-building', A, 'โรงพยาบาล กลุ่มงาน โลโก้ ปีงบประมาณ'], ['users', 'ผู้ใช้งาน', 'bi-people', A, 'เพิ่มผู้ใช้ สิทธิ์ รหัสผ่าน'], ['profile', 'บัญชีของฉัน', 'bi-person-circle', ALL, 'เปลี่ยนชื่อ เปลี่ยนรหัสผ่าน']] },
     { key: 'master', name: 'ข้อมูลหลัก', desc: 'หมวดวัสดุ บริษัทผู้จำหน่าย และรายชื่อผู้เบิก', icon: 'bi-database',
       items: [['categories', 'หมวดวัสดุ', 'bi-tags', A, 'ประเภทวัสดุ รหัสนำหน้า สี'], ['suppliers', 'บริษัทผู้จำหน่าย', 'bi-truck', W, 'ชื่อบริษัท ผู้ติดต่อ โทรศัพท์'], ['requesters', 'ผู้เบิก', 'bi-person-badge', W, 'ชื่อผู้เบิก ตำแหน่ง จุดบริการ']] },
-    { key: 'stock', name: 'คลังและแจ้งเตือน', desc: 'เกณฑ์วันหมดอายุ และการส่งแจ้งเตือนทาง Telegram หรืออีเมล', icon: 'bi-bell',
-      items: [['expiry', 'เกณฑ์แจ้งเตือน', 'bi-hourglass-split', A, '30 60 120 วัน หมดเวลาเข้าระบบ'], ['notify', 'ช่องทางแจ้งเตือน', 'bi-send', A, 'Telegram อีเมล สรุปรายวัน']] },
+    { key: 'stock', name: 'คลังและแจ้งเตือน', desc: 'เกณฑ์วันหมดอายุ และการส่งแจ้งเตือนทาง LINE Telegram หรืออีเมล', icon: 'bi-bell',
+      items: [['expiry', 'เกณฑ์แจ้งเตือน', 'bi-hourglass-split', A, '30 60 120 วัน หมดเวลาเข้าระบบ'], ['notify', 'ช่องทางแจ้งเตือน', 'bi-send', A, 'LINE Telegram อีเมล สรุปรายวัน']] },
     { key: 'system', name: 'หน้าตาและระบบ', desc: 'สีระบบ รูปภาพ สำรองข้อมูล และเครื่องมือดูแลระบบ', icon: 'bi-palette',
       items: [['theme', 'หน้าตาระบบ', 'bi-palette', A, 'สีหลัก'], ['artwork', 'รูปภาพระบบ', 'bi-image', A, 'ภาพหน้าเข้าสู่ระบบ หน้าตั้งค่า คู่มือ'], ['tools', 'เครื่องมือระบบ', 'bi-tools', A, 'คำนวณยอดใหม่ สำรองข้อมูล ข้อมูลตัวอย่าง ล้างข้อมูล'], ['connect', 'การเชื่อมต่อ', 'bi-plug', ALL, 'URL ของ Web App']] },
   ];
@@ -322,11 +322,20 @@
 
     /* ---------- ช่องทางแจ้งเตือน ---------- */
     async sec_notify(box) {
-      const c = (await this.loadCfg()).config, n = c.notify;
+      const cg = await this.loadCfg(true), c = cg.config, n = c.notify;
+      let targets = (n.lineTargets || []).map(t => Object.assign({}, t));
       box.innerHTML = `<form class="row g-3" onsubmit="return false">
         <div class="col-md-6"><label class="form-label">สรุปแจ้งเตือนอัตโนมัติรายวัน</label>${SP.ui.switch('daily', n.daily, 'ส่งสรุปวัสดุต่ำกว่าขั้นต่ำ หมดอายุ และใกล้หมดอายุทุกวัน')}</div>
         ${SP.ui.f('เวลาส่ง', SP.ui.select('hour', Array.from({ length: 24 }, (x, i) => [i, String(i).padStart(2, '0') + ':00 น.']), n.hour), { col: 'col-md-3' })}
         <div class="col-md-3"><label class="form-label">แจ้งทันที</label>${SP.ui.switch('instant', n.instant, 'เมื่อจ่ายแล้วต่ำกว่าขั้นต่ำ')}</div>
+        <div class="col-12"><hr class="my-1"><h6 class="fw-bold mt-2"><i class="bi bi-line" style="color:#06C755"></i> LINE (LINE Official Account)</h6></div>
+        ${SP.ui.f('Channel access token', SP.ui.input('lineToken', '', 'type="password" autocomplete="off" placeholder="' + (n.lineTokenSet ? 'ตั้งค่าแล้ว เว้นว่างถ้าไม่เปลี่ยน' : 'วาง Channel access token (long-lived)') + '"'), { hint: n.lineTokenSet ? '<label class="form-check-label"><input class="form-check-input me-1" type="checkbox" name="lineTokenClear">ลบ Token เดิม</label>' : 'ได้จาก LINE Developers Console > Messaging API ของบัญชี LINE OA' })}
+        <div class="col-12" data-no-enter><label class="form-label">Webhook URL (วางใน LINE Developers Console)</label>
+          <div class="input-group"><input class="form-control" id="lnHook" value="${e(cg.line_webhook || '')}" readonly><button class="btn btn-light border" type="button" id="lnCopy"><i class="bi bi-clipboard"></i> คัดลอก</button></div>
+          <div class="form-text">เปิด Use webhook ด้วย เมื่อเพิ่มบอทเข้ากลุ่มหรือมีคนแอดบอทเป็นเพื่อน ระบบจะเห็นกลุ่ม/ผู้ใช้นั้นในรายการด้านล่าง</div></div>
+        <div class="col-lg-6"><div class="fw-600 small mb-2">ผู้รับแจ้งเตือน LINE</div><div id="lnTargets"></div></div>
+        <div class="col-lg-6"><div class="d-flex align-items-center mb-2"><span class="fw-600 small">กลุ่ม/ผู้ใช้ที่บอทพบล่าสุด</span><button class="btn btn-sm btn-light ms-auto" type="button" id="lnReload"><i class="bi bi-arrow-repeat"></i> โหลดใหม่</button></div><div id="lnSources"></div>
+          <div class="input-group input-group-sm mt-2" data-no-enter><input class="form-control" id="lnManual" placeholder="หรือวางรหัส U... / C... เอง"><button class="btn btn-light border" type="button" id="lnAdd">เพิ่ม</button></div></div>
         <div class="col-12"><hr class="my-1"><h6 class="fw-bold mt-2"><i class="bi bi-telegram text-info"></i> Telegram</h6></div>
         ${SP.ui.f('Bot Token', SP.ui.input('tgToken', '', 'type="password" autocomplete="off" placeholder="' + (n.tgTokenSet ? 'ตั้งค่าแล้ว เว้นว่างถ้าไม่เปลี่ยน' : 'เช่น 123456789:AA...') + '"'), { col: 'col-md-7', hint: n.tgTokenSet ? '<label class="form-check-label"><input class="form-check-input me-1" type="checkbox" name="tgTokenClear">ลบ Token เดิม</label>' : 'สร้างบอทที่ @BotFather แล้วนำ Token มาวาง' })}
         ${SP.ui.f('Chat ID', SP.ui.input('tgChat', n.tgChat, 'placeholder="เช่น -1001234567890"'), { col: 'col-md-5', hint: 'เพิ่มบอทเข้ากลุ่ม แล้วดู Chat ID จาก getUpdates' })}
@@ -336,15 +345,56 @@
           <button class="btn btn-soft" type="button" id="ntTest"><i class="bi bi-send"></i> ทดสอบส่ง</button><button class="btn btn-light" type="button" id="ntNow"><i class="bi bi-lightning"></i> ส่งสรุปตอนนี้</button></div>
         <div class="col-12"><div class="g-note info"><i class="bi bi-lightbulb"></i><div class="small">วิธีหา Chat ID: เพิ่มบอทเข้ากลุ่ม Telegram ของหน่วยงาน พิมพ์ข้อความใดก็ได้ในกลุ่ม แล้วเปิด https://api.telegram.org/bot&lt;Token&gt;/getUpdates ในเบราว์เซอร์ ตัวเลขหลัง "chat":{"id": คือ Chat ID (ของกลุ่มจะขึ้นต้นด้วยเครื่องหมายลบ)</div></div></div>
       </form>`;
+      const typeName = t => (t === 'user' ? 'ผู้ใช้' : (t === 'room' ? 'ห้องแชต' : 'กลุ่ม'));
+      const drawTargets = () => {
+        SP.$('#lnTargets', box).innerHTML = targets.length ? targets.map((t, i) => `<div class="list-row" style="cursor:default"><span class="list-ico" style="background:#e8f9ef;color:#06C755"><i class="bi ${t.type === 'user' ? 'bi-person' : 'bi-people'}"></i></span>
+          <div class="meta"><input class="form-control form-control-sm" data-tn="${i}" value="${e(t.name)}" aria-label="ชื่อเรียก"><div class="s">${typeName(t.type)} · ${e(t.id.slice(0, 10))}...</div></div>
+          <button class="btn btn-sm btn-danger-soft" type="button" data-trm="${i}" aria-label="เอาออก"><i class="bi bi-x-lg"></i></button></div>`).join('')
+          : '<div class="small-muted p-2">ยังไม่มีผู้รับ เลือกจากรายการด้านขวา</div>';
+      };
+      const drawSources = list => {
+        const src = (list || []).filter(s => s.type !== 'room');
+        SP.$('#lnSources', box).innerHTML = src.length ? src.map(s => {
+          const added = targets.some(t => t.id === s.id);
+          return `<div class="list-row" style="cursor:default"><span class="list-ico tint-primary"><i class="bi ${s.type === 'user' ? 'bi-person' : 'bi-people'}"></i></span>
+            <div class="meta"><div class="t">${e(s.name || (typeName(s.type) + ' ไม่ทราบชื่อ'))}</div><div class="s">${typeName(s.type)} · ${e(SP.fmt.dateTime(s.ts))}</div></div>
+            ${added ? '<span class="b-soft b-success">เป็นผู้รับแล้ว</span>' : `<button class="btn btn-sm btn-soft" type="button" data-sadd="${e(s.id)}" data-sname="${e(s.name || '')}" data-stype="${e(s.type)}"><i class="bi bi-plus-lg"></i> เพิ่มเป็นผู้รับ</button>`}</div>`;
+        }).join('') : '<div class="small-muted p-2">ยังไม่พบ ตั้ง Webhook แล้วเชิญบอทเข้ากลุ่ม LINE (หรือพิมพ์ id ในกลุ่ม) แล้วกด โหลดใหม่</div>';
+      };
+      let sources = cg.line_sources || [];
+      drawTargets(); drawSources(sources);
+      box.addEventListener('input', ev => { if (ev.target.dataset.tn !== undefined) targets[+ev.target.dataset.tn].name = ev.target.value; });
+      box.addEventListener('click', ev => {
+        const rm = ev.target.closest('[data-trm]');
+        if (rm) { targets.splice(+rm.dataset.trm, 1); drawTargets(); drawSources(sources); return; }
+        const ad = ev.target.closest('[data-sadd]');
+        if (ad) { targets.push({ id: ad.dataset.sadd, name: ad.dataset.sname || (ad.dataset.stype === 'user' ? 'ผู้ใช้' : 'กลุ่มแจ้งเตือน'), type: ad.dataset.stype }); drawTargets(); drawSources(sources); SP.toast('เพิ่มแล้ว กดบันทึกเพื่อยืนยัน', 'info'); }
+      });
+      SP.$('#lnAdd', box).addEventListener('click', () => {
+        const v = SP.$('#lnManual', box).value.trim();
+        if (!/^[UCR][0-9a-f]{32}$/.test(v)) return SP.toast('รหัสต้องขึ้นต้น U (ผู้ใช้) หรือ C (กลุ่ม) ตามด้วยตัวอักษร 32 ตัว', 'warning');
+        if (!targets.some(t => t.id === v)) targets.push({ id: v, name: v.charAt(0) === 'U' ? 'ผู้ใช้' : 'กลุ่มแจ้งเตือน', type: v.charAt(0) === 'U' ? 'user' : 'group' });
+        SP.$('#lnManual', box).value = '';
+        drawTargets(); drawSources(sources);
+      });
+      SP.$('#lnReload', box).addEventListener('click', async ev => {
+        SP.ui.busy(ev.currentTarget, true, 'กำลังโหลด...');
+        try { const r = await this.loadCfg(true); sources = r.line_sources || []; drawSources(sources); } catch (er) { SP.err(er); } finally { SP.ui.busy(ev.currentTarget, false); }
+      });
+      SP.$('#lnCopy', box).addEventListener('click', () => {
+        const i = SP.$('#lnHook', box);
+        try { navigator.clipboard.writeText(i.value).then(() => SP.toast('คัดลอก Webhook URL แล้ว')); } catch (er) { i.select(); SP.toast('กด Ctrl+C เพื่อคัดลอก', 'info'); }
+      });
       this.bindSave(box, async () => {
         const f = SP.ui.form(box);
+        f.lineTargets = targets;
         await this.saveCfg('notify', f);
         this.open('notify');
       });
       const run = async (btn, fn) => { SP.ui.busy(btn, true, 'กำลังส่ง...'); try { await fn(); } catch (er) { SP.err(er); } finally { SP.ui.busy(btn, false); } };
       SP.$('#ntTest', box).addEventListener('click', ev => run(ev.currentTarget, async () => {
         const r = await SP.api('notify.test');
-        SP.ui.alert('ผลการทดสอบ', `Telegram: <b>${e(r.telegram)}</b><br>อีเมล: <b>${e(r.email)}</b><div class="small-muted mt-2">ถ้าเพิ่งแก้ค่า ให้กดบันทึกก่อนทดสอบ</div>`, { icon: 'bi-send' });
+        SP.ui.alert('ผลการทดสอบ', `LINE: <b>${e(r.line)}</b><br>Telegram: <b>${e(r.telegram)}</b><br>อีเมล: <b>${e(r.email)}</b><div class="small-muted mt-2">ถ้าเพิ่งแก้ค่า ให้กดบันทึกก่อนทดสอบ</div>`, { icon: 'bi-send' });
       }));
       SP.$('#ntNow', box).addEventListener('click', ev => run(ev.currentTarget, async () => {
         const r = await SP.api('tools.run', { op: 'alert' });

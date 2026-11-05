@@ -5,5 +5,5 @@
  * ถ้าแก้ไฟล์นี้ไม่สะดวก ตั้งค่าได้ที่หน้าเข้าสู่ระบบ > การเชื่อมต่อ (เก็บเฉพาะเครื่องนั้น)
  */
 window.LABSUPPLY_CONFIG = {
-  API_URL: 'https://script.google.com/macros/s/AKfycbw9Xylq4MKipcXChH5Z7KqWP1gM2b8Lg2ieZ4NqV4unFjTVi58Mu-ULi9O4B4710RUBtA/exec',
+  API_URL: '',
 };

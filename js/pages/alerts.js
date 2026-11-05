@@ -16,7 +16,7 @@
       const k = SP.kpi(), cfg = SP.state.boot.config;
       if (!this.bk) this.bk = k.bk.expired.n ? 'expired' : 'd1';
       const n = cfg.notify || {};
-      const ch = [n.telegram ? 'Telegram' : '', n.email ? 'อีเมล' : ''].filter(Boolean).join(' และ ');
+      const ch = [n.line ? 'LINE' : '', n.telegram ? 'Telegram' : '', n.email ? 'อีเมล' : ''].filter(Boolean).join(' และ ');
       const mini = (icon, tint, val, lbl, go) => `<div class="col-6 col-md-4 col-xl-2"><a class="stat text-decoration-none text-body" href="${go}"><div class="stat-ico ${tint}"><i class="bi ${icon}"></i></div><div class="min-w-0"><div class="num" style="font-size:1.25rem">${val}</div><div class="lbl">${e(lbl)}</div></div></a></div>`;
       el.innerHTML = `<div class="page-head"><div><h1>แจ้งเตือน</h1><div class="sub">วัสดุที่ต่ำกว่าจำนวนขั้นต่ำ และล็อตที่ใกล้หมดอายุ ตรวจทุกวันก่อนเริ่มงาน</div></div>
           <div class="actions"><button class="btn btn-soft" type="button" data-a="print"><i class="bi bi-printer"></i> พิมพ์</button><button class="btn btn-light" type="button" data-a="csv"><i class="bi bi-download"></i> CSV</button>
@@ -25,7 +25,7 @@
           ${mini('bi-arrow-down-circle', 'tint-warning', k.low, 'ต่ำกว่าขั้นต่ำ', '#/alerts?tab=low')}
           ${SP.BK_KEYS.map(x => mini('bi-hourglass-split', 'bk-' + x, k.bk[x].n, SP.bkLabel(x) + ' (ล็อต)', '#/alerts?tab=exp&b=' + x)).join('')}
         </div>
-        <div class="alert ${n.daily ? 'alert-success' : 'alert-secondary'} py-2"><i class="bi ${n.daily ? 'bi-send-check' : 'bi-send-slash'}"></i><div class="small">${n.daily ? 'ส่งสรุปแจ้งเตือนอัตโนมัติทุกวันเวลา ' + String(n.hour).padStart(2, '0') + ':00 น.' + (ch ? ' ทาง ' + ch : ' (ยังไม่ได้ตั้งช่องทาง)') : 'ยังไม่ได้เปิดส่งสรุปแจ้งเตือนอัตโนมัติทาง Telegram หรืออีเมล' + (SP.isAdmin() ? ' เปิดได้ที่ ตั้งค่า > ช่องทางแจ้งเตือน' : '')}</div></div>
+        <div class="alert ${n.daily ? 'alert-success' : 'alert-secondary'} py-2"><i class="bi ${n.daily ? 'bi-send-check' : 'bi-send-slash'}"></i><div class="small">${n.daily ? 'ส่งสรุปแจ้งเตือนอัตโนมัติทุกวันเวลา ' + String(n.hour).padStart(2, '0') + ':00 น.' + (ch ? ' ทาง ' + ch : ' (ยังไม่ได้ตั้งช่องทาง)') : 'ยังไม่ได้เปิดส่งสรุปแจ้งเตือนอัตโนมัติทาง LINE Telegram หรืออีเมล' + (SP.isAdmin() ? ' เปิดได้ที่ ตั้งค่า > ช่องทางแจ้งเตือน' : '')}</div></div>
         <div class="nav nav-pills mb-3" id="alTabs">
           <button class="nav-link ${this.tab === 'low' ? 'active' : ''}" type="button" data-tab="low"><i class="bi bi-arrow-down-circle"></i> ต่ำกว่าขั้นต่ำ <span class="badge rounded-pill text-bg-light">${k.low}</span></button>
           <button class="nav-link ${this.tab === 'exp' ? 'active' : ''}" type="button" data-tab="exp"><i class="bi bi-hourglass-split"></i> วันหมดอายุ <span class="badge rounded-pill text-bg-light">${k.bk.expired.n + k.bk.d1.n}</span></button></div>

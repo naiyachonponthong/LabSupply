@@ -90,7 +90,7 @@
         return `<tr class="tr-click" data-view="${it.id}">
           <td data-stop><input class="form-check-input" type="checkbox" data-sel="${it.id}" ${st.sel[it.id] ? 'checked' : ''} aria-label="เลือก"></td>
           <td><span class="code-chip">${e(it.code)}</span></td>
-          <td style="min-width:220px"><div class="fw-600">${SP.catDot(it)}${e(it.name)}</div><div class="small-muted">${(it.barcodes || []).length ? '<i class="bi bi-upc"></i> ' + e(it.barcodes.join(', ')) : 'ยังไม่มีบาร์โค้ด'}</div></td>
+          <td style="min-width:250px"><div class="d-flex gap-2 align-items-center">${SP.thumb(it)}<div class="min-w-0"><div class="fw-600">${SP.catDot(it)}${e(it.name)}</div><div class="small-muted">${(it.barcodes || []).length ? '<i class="bi bi-upc"></i> ' + e(it.barcodes.join(', ')) : 'ยังไม่มีบาร์โค้ด'}</div></div></div></td>
           <td class="small" style="min-width:140px">${e(sup ? sup.name : '-')}</td>
           <td class="num">${SP.fmt.money(it.price)}</td>
           <td class="num small">${e(SP.packText(it))}</td>
@@ -102,7 +102,7 @@
       };
       const card = it => {
         const sup = SP.idx.sup[it.supplier_id];
-        return `<div class="m-card" data-view="${it.id}"><div class="d-flex justify-content-between gap-2"><div class="fw-600 min-w-0">${SP.catDot(it)}${e(it.name)}</div><b class="text-nowrap">${SP.fmt.num(it._bal)} ${e(it.unit)}</b></div>
+        return `<div class="m-card" data-view="${it.id}"><div class="d-flex justify-content-between gap-2"><div class="fw-600 min-w-0 d-flex gap-2 align-items-center">${SP.thumb(it, 'sm')}<span>${SP.catDot(it)}${e(it.name)}</span></div><b class="text-nowrap">${SP.fmt.num(it._bal)} ${e(it.unit)}</b></div>
           <div class="row2"><span><span class="code-chip">${e(it.code)}</span> ${e(sup ? sup.name : '')}</span><span>${SP.fmt.money(it.price)} บาท/${e(it.unit)}</span></div>
           <div class="row2"><span>${status(it)} ${it._near ? SP.expPill(it._near) : ''}</span><span>มูลค่า <b class="text-body">${SP.fmt.money(it._val)}</b></span></div></div>`;
       };
@@ -162,6 +162,7 @@
       const bcs = (cur.barcodes || []).slice();
       if (opt.barcode && bcs.indexOf(opt.barcode) < 0) bcs.push(opt.barcode);
       const z = v => (v === 0 || v === '0' ? '' : v);
+      let photo = null, photoDel = false;
       const body = `<form class="row g-3" onsubmit="return false">
         ${SP.ui.f('ประเภทวัสดุ', SP.ui.select('category_id', SP.opt.cats(), cur.category_id), { col: 'col-md-7', req: true })}
         ${SP.ui.f('รหัสวัสดุ', SP.ui.input('code', cur.code, 'placeholder="เว้นว่างให้ระบบตั้งให้" autocapitalize="characters"'), { col: 'col-md-5', hint: isNew ? 'ระบบตั้งรหัสตามประเภท เช่น MS-0001' : '' })}
@@ -171,6 +172,13 @@
           <button class="btn btn-soft" type="button" id="ifBcCam"><i class="bi bi-camera"></i> กล้อง</button></div>
           <div class="bc-chips" id="ifBcs"></div>
           <div class="form-text">เพิ่มได้หลายค่า (เช่น บาร์โค้ดของแต่ละบริษัท) ถ้าวัสดุไม่มีบาร์โค้ด ให้พิมพ์สติกเกอร์จากรหัสวัสดุแทน</div></div>
+        <div class="col-12" data-no-enter><label class="form-label">รูปวัสดุ</label>
+          <div class="d-flex gap-3 align-items-center flex-wrap"><div class="photo-box" id="ifPhoto">${cur.image ? `<img src="${e(cur.image)}" alt="">` : '<i class="bi bi-image"></i>'}</div>
+          <div class="d-flex flex-column gap-2"><div class="d-flex gap-2 flex-wrap">
+            <label class="btn btn-soft mb-0"><i class="bi bi-camera"></i> ถ่ายรูป<input type="file" accept="image/*" capture="environment" hidden data-photo></label>
+            <label class="btn btn-light mb-0"><i class="bi bi-folder2-open"></i> เลือกรูป<input type="file" accept="image/png,image/jpeg,image/webp" hidden data-photo></label>
+            <button class="btn btn-light" type="button" id="ifPhotoDel"${cur.image ? '' : ' hidden'}><i class="bi bi-trash"></i> ลบรูป</button></div>
+          <div class="form-text">ถ่ายให้เห็นฉลากและสีกล่องชัด ช่วยให้หยิบของถูก ระบบย่อรูปให้อัตโนมัติ (JPG PNG WebP ไม่เกิน 8 MB)</div></div></div></div>
         <div class="col-md-8"><label class="form-label">บริษัทผู้จำหน่าย</label><div class="d-flex gap-2"><div class="flex-grow-1 min-w-0">${SP.ui.select('supplier_id', SP.opt.suppliers(), cur.supplier_id, 'data-search data-placeholder="แตะเพื่อเลือกบริษัท หรือพิมพ์ค้นหา"', 'ไม่ระบุ')}</div>
           <button class="btn btn-light" type="button" id="ifSupAdd" title="เพิ่มบริษัทใหม่" aria-label="เพิ่มบริษัทใหม่"><i class="bi bi-plus-lg"></i></button></div></div>
         ${SP.ui.f('ราคา/หน่วย (บาท)', SP.ui.input('price', z(cur.price), 'type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"'), { col: 'col-md-4' })}
@@ -206,6 +214,19 @@
             return true;
           };
           drawChips();
+          const pbox = SP.$('#ifPhoto', root), pdel = SP.$('#ifPhotoDel', root);
+          SP.$$('[data-photo]', root).forEach(inp => inp.addEventListener('change', async () => {
+            const file = inp.files[0];
+            inp.value = '';
+            if (!file) return;
+            try {
+              photo = await SP.readImage(file, 800);
+              photoDel = false;
+              pbox.innerHTML = `<img src="${photo.dataUrl}" alt="">`;
+              pdel.hidden = false;
+            } catch (er) { SP.err(er); }
+          }));
+          pdel.addEventListener('click', () => { photo = null; photoDel = true; pbox.innerHTML = '<i class="bi bi-image"></i>'; pdel.hidden = true; });
           chips.addEventListener('click', ev => { const r = ev.target.closest('[data-rm]'); if (r) { bcs.splice(+r.dataset.rm, 1); drawChips(); } });
           SP.scan.bind(SP.$('#ifBc', root), code => addBc(code));
           SP.$('#ifBcCam', root).addEventListener('click', () => SP.cam.open({
@@ -243,6 +264,12 @@
           if (pending) bcs.push(pending);
           f.barcodes = bcs;
           if (it) f.id = it.id;
+          f.image = photoDel ? '' : (cur.image || '');
+          if (photo) {
+            const up = await SP.api('file.upload', { b64: photo.b64, mime: photo.mime, name: 'item-' + Date.now() + (photo.mime === 'image/png' ? '.png' : '.jpg'), purpose: 'item ' + f.name });
+            f.image = up.url.replace(/sz=w\d+/, 'sz=w800');
+            photo = null;
+          }
           const saved = await SP.api('item.save', f);
           SP.upsert('items', saved);
           SP.toast((isNew ? 'เพิ่ม' : 'บันทึก') + 'วัสดุ ' + saved.name + ' แล้ว');
@@ -272,6 +299,7 @@
         <td class="num fw-600 ${m.qty < 0 ? 'text-danger' : 'text-success'}">${m.qty > 0 ? '+' : ''}${SP.fmt.num(m.qty)}</td><td class="small">${e(m.party || '')}</td></tr>`).join('');
       SP.ui.setTitle(`<i class="bi bi-capsule"></i> ${e(x.name)}`);
       SP.$('#spModalBody').innerHTML = `
+        ${x.image ? `<a href="${e(x.image)}" target="_blank" rel="noopener" class="d-inline-block mb-3" title="เปิดรูปขนาดใหญ่">${SP.thumb(x, 'xl')}</a>` : ''}
         <div class="d-flex flex-wrap gap-2 align-items-center mb-3"><span class="b-soft" style="background:${e(cat.color)}1a;color:${e(cat.color)}"><span class="cat-dot" style="background:${e(cat.color)}"></span>${e(cat.name)}</span>
           <span class="code-chip">${e(x.code)}</span>${x.status === 'inactive' ? '<span class="b-soft b-mute">ไม่ใช้งาน</span>' : ''}${x._low ? '<span class="b-soft b-warning">ต่ำกว่าขั้นต่ำ</span>' : ''}</div>
         <div class="row g-2 mb-3">

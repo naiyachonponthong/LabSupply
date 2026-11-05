@@ -178,7 +178,7 @@
       }).join('');
       const bad = a && (a.err || a.short || !(+l.qty > 0));
       return `<div class="cart-line${bad ? ' need' : ''}" data-k="${l.k}">
-        <div class="cl-head"><div class="cl-name">${SP.catDot(it)}${e(it.name)}<div class="sub">${e(it.code)} · จ่ายได้ ${SP.fmt.num(avail)} ${e(it.unit)}${nExp ? ' · มีล็อตหมดอายุ ' + nExp + ' ล็อต (ไม่นำมาจ่าย)' : ''}</div></div>
+        <div class="cl-head">${SP.thumb(it)}<div class="cl-name">${SP.catDot(it)}${e(it.name)}<div class="sub">${e(it.code)} · จ่ายได้ ${SP.fmt.num(avail)} ${e(it.unit)}${nExp ? ' · มีล็อตหมดอายุ ' + nExp + ' ล็อต (ไม่นำมาจ่าย)' : ''}</div></div>
           <button class="btn btn-sm btn-light" type="button" data-del="${l.k}" aria-label="ลบรายการ"><i class="bi bi-x-lg"></i></button></div>
         <div class="cl-grid issue">
           <div><label>ล็อตที่จ่าย</label><select class="form-select" data-f="lot_id">${opts}</select></div>

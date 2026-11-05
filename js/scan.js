@@ -295,7 +295,7 @@
         && (!q || (it.name + ' ' + it.code + ' ' + (it.barcodes || []).join(' ')).toLowerCase().indexOf(q) >= 0)).sort(SP.byName);
       const draw = body => {
         const list = rows();
-        SP.$('#pkList', body).innerHTML = list.length ? list.slice(0, 300).map(it => `<div class="pick-row${picked[it.id] ? ' picked' : ''}" data-id="${it.id}">${SP.catDot(it)}
+        SP.$('#pkList', body).innerHTML = list.length ? list.slice(0, 300).map(it => `<div class="pick-row${picked[it.id] ? ' picked' : ''}" data-id="${it.id}">${SP.thumb(it, 'sm')}
           <div class="min-w-0 flex-grow-1"><div class="fw-600 ellipsis">${SP.esc(it.name)}</div><div class="small-muted">${SP.esc(it.code)} · คงเหลือ ${SP.fmt.num(it._bal)} ${SP.esc(it.unit)}${it._near ? ' · หมดอายุใกล้สุด ' + SP.fmt.dateShort(it._near) : ''}</div></div>
           ${picked[it.id] ? `<span class="b-soft b-success">เพิ่มแล้ว ${picked[it.id]}</span>` : '<i class="bi bi-plus-circle text-muted fs-5"></i>'}</div>`).join('')
           : SP.ui.empty('bi-search', 'ไม่พบวัสดุ', 'ลองเปลี่ยนคำค้นหรือประเภทวัสดุ');

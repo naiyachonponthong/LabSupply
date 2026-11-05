@@ -6,7 +6,7 @@
   'use strict';
   const SP = window.SP = window.SP || {};
   SP.pages = SP.pages || {};
-  SP.VERSION = '1.0.0';
+  SP.VERSION = '1.0.2';
   SP.state = { token: '', user: null, boot: null, stats: null, page: '', param: {} };
   SP.ROLE = { admin: 'ผู้ดูแลระบบ', staff: 'เจ้าหน้าที่คลัง', viewer: 'ผู้บริหาร (ดูอย่างเดียว)' };
 
@@ -205,6 +205,10 @@
   SP.itemLabel = it => it ? it.name : '(ไม่พบวัสดุ)';
   SP.catOf = it => (it && SP.idx.cat[it.category_id]) || { name: '-', color: '#94a3b8' };
   SP.catDot = it => `<span class="cat-dot" style="background:${SP.esc(SP.catOf(it).color || '#94a3b8')}"></span>`;
+  /** รูปวัสดุขนาดเล็ก ไม่มีรูปใช้ไอคอนสีตามประเภท cls: sm | lg | xl */
+  SP.thumb = (it, cls) => (it && it.image
+    ? `<span class="thumb ${cls || ''}"><img src="${SP.esc(it.image)}" alt="" loading="lazy" onerror="this.parentNode.classList.add('noimg');this.parentNode.innerHTML='<i class=&quot;bi bi-box-seam&quot;></i>'"></span>`
+    : `<span class="thumb noimg ${cls || ''}" style="--c:${SP.esc(SP.catOf(it).color || '#94a3b8')}"><i class="bi bi-box-seam"></i></span>`);
   SP.packText = it => (it && it.pack_qty > 0 ? SP.fmt.num(it.pack_qty) + ' ' + (it.pack_unit || '') + '/' + (it.unit || '') : '-');
   SP.upsert = function (list, rec) {
     const arr = SP.state.boot[list];
@@ -799,14 +803,14 @@
       if (q) {
         const nq = SP.normBc(q);
         SP.state.boot.items.filter(it => it.status !== 'deleted' && ((it.name + ' ' + it.code).toLowerCase().indexOf(q) >= 0 || (it.barcodes || []).some(b => SP.normBc(b) === nq || String(b).toLowerCase().indexOf(q) >= 0)))
-          .slice(0, 8).forEach(it => rows.push({ g: 'วัสดุ', icon: 'bi-capsule', t: it.name, s: it.code + ' · คงเหลือ ' + SP.fmt.num(it._bal) + ' ' + it.unit, item: it.id }));
+          .slice(0, 8).forEach(it => rows.push({ g: 'วัสดุ', icon: 'bi-capsule', thumb: SP.thumb(it), t: it.name, s: it.code + ' · คงเหลือ ' + SP.fmt.num(it._bal) + ' ' + it.unit, item: it.id }));
         if (SP.guide) SP.guide.search(q).slice(0, 6).forEach(tp => rows.push({ g: 'คู่มือ', icon: tp.icon, t: tp.title, s: tp.sum, go: '#/guide?t=' + tp.key }));
       }
       this.rows = rows; this.hi = 0;
       let h = '', g = '';
       rows.forEach((r, i) => {
         if (r.g !== g) { g = r.g; h += `<div class="sr-group">${g}</div>`; }
-        h += `<div class="sr-item${i === 0 ? ' hi' : ''}" data-sr="${i}"><span class="list-ico tint-primary"><i class="bi ${r.icon}"></i></span><div class="min-w-0"><div class="fw-600 ellipsis">${SP.esc(r.t)}</div><div class="small-muted ellipsis">${SP.esc(r.s || '')}</div></div></div>`;
+        h += `<div class="sr-item${i === 0 ? ' hi' : ''}" data-sr="${i}">${r.thumb || `<span class="list-ico tint-primary"><i class="bi ${r.icon}"></i></span>`}<div class="min-w-0"><div class="fw-600 ellipsis">${SP.esc(r.t)}</div><div class="small-muted ellipsis">${SP.esc(r.s || '')}</div></div></div>`;
       });
       SP.$('#spSearchBody').innerHTML = h || SP.ui.empty('bi-search', 'ไม่พบผลลัพธ์', 'ลองพิมพ์ชื่อวัสดุ รหัส หรือบาร์โค้ด');
     },

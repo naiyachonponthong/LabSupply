@@ -142,7 +142,7 @@
       const need = it.has_expiry && (!l.lot_no || !l.exp);
       const req = it.has_expiry ? ' *' : '';
       return `<div class="cart-line${need ? ' need' : ''}" data-k="${l.k}">
-        <div class="cl-head"><div class="cl-name">${SP.catDot(it)}${e(it.name)}<div class="sub">${e(it.code)} · คงเหลือเดิม ${SP.fmt.num(it._bal)} ${e(it.unit)}${SP.packText(it) !== '-' ? ' · ' + e(SP.packText(it)) : ''}</div></div>
+        <div class="cl-head">${SP.thumb(it)}<div class="cl-name">${SP.catDot(it)}${e(it.name)}<div class="sub">${e(it.code)} · คงเหลือเดิม ${SP.fmt.num(it._bal)} ${e(it.unit)}${SP.packText(it) !== '-' ? ' · ' + e(SP.packText(it)) : ''}</div></div>
           <button class="btn btn-sm btn-light" type="button" data-del="${l.k}" aria-label="ลบรายการ"><i class="bi bi-x-lg"></i></button></div>
         <div class="cl-grid">
           <div><label>Lot number${req}</label><input class="form-control" data-f="lot_no" value="${e(l.lot_no)}" placeholder="${it.has_expiry ? 'เลขการผลิต' : 'ไม่บังคับ'}" maxlength="40" autocapitalize="characters"></div>
