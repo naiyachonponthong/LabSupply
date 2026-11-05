@@ -1,7 +1,7 @@
 /* LabSupply service worker: แคชเฉพาะไฟล์หน้าเว็บของตัวเอง (network-first)
  * ไม่แตะคำขอไป script.google.com หรือ CDN เด็ดขาด ข้อมูลจริงมาจาก server เสมอ
  * เปลี่ยน VERSION ทุกครั้งที่อัปโหลดไฟล์ชุดใหม่ */
-const VERSION = 'labsupply-1.0.2';
+const VERSION = 'labsupply-1.0.3';
 const ASSETS = [
   './', 'index.html', 'manifest.json', 'assets/app.css',
   'js/config.js', 'js/core.js', 'js/scan.js', 'js/print.js', 'js/docs.js', 'js/guide-content.js', 'js/app.js',

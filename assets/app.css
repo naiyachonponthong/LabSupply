@@ -422,9 +422,11 @@ ol.guide-steps > li::before { content: counter(st); position: absolute; left: 0;
 .login-card .form-control { height: 48px; }
 @media (max-width: 991.98px) {
   .login-wrap { grid-template-columns: 1fr; align-content: start; }
-  .login-art { padding: calc(env(safe-area-inset-top) + 1.6rem) 1.4rem 4.6rem; border-radius: 0 0 26px 26px; }
+  .login-art { padding: calc(env(safe-area-inset-top) + 1.4rem) 1.4rem 4.4rem; border-radius: 0 0 26px 26px; gap: 1rem; }
+  .login-art .lg-dept { font-size: 1.05rem; }
+  .login-art .opacity-75 { font-size: .9rem; }
   .login-art .lg-h { font-size: 1.45rem; }
-  .login-form { margin-top: -3.2rem; padding: 0 1rem 2rem; place-items: start center; }
+  .login-form { margin-top: -3.2rem; padding: 0 1rem calc(2rem + env(safe-area-inset-bottom)); place-items: start center; position: relative; z-index: 2; }
   .login-card { background: #fff; border-radius: 20px; box-shadow: var(--sb-shadow-lift); padding: 1.5rem; }
 }
 
